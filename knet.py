@@ -1,4 +1,22 @@
-"""Generisk Kvadranet Generator"""
+"""Generisk Kvadranet Generator
+
+TODO:
+
+    Implement as an app and an API.
+
+    App:
+
+      knet tindex --zone=24 *.tif output.json
+      knet create 10km --bbox=[Nmin Nmax Emin Emax]
+
+
+    API:
+
+      tilename2wkt() / wkt2tilename()?
+      point2tilename(x,y)
+
+"""
+
 
 import math
 
