@@ -1,5 +1,5 @@
 from nose.tools import *
-from knet.knet import KNet
+from knet.tools import KNet
 
 
 class TestKNet(object):
