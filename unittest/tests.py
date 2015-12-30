@@ -1,5 +1,5 @@
 from nose.tools import *
-from knet.tools import KNet
+from knet.tools import tilename_from_point
 
 
 class TestKNet(object):
@@ -17,33 +17,15 @@ class TestKNet(object):
     def tearDown(self):
         pass
 
-    def test_init_inputs(self):
-        assert_raises(ValueError, KNet, '12km', 32, 'n')
-        assert_raises(ValueError, KNet, '1000m', 32, 'n')
-        assert_raises(ValueError, KNet, '100m', 0, 'n')
-        assert_raises(ValueError, KNet, '100m', -1, 'n')
-        assert_raises(ValueError, KNet, '100m', 61, 'n')
-        assert_raises(ValueError, KNet, '10km', 32, 'p')
-        assert_raises(ValueError, KNet, '10km', 32, 'w')
-
-    def test_validate_coordinate_inputs(self):
-        N = KNet('100m', 32, 'n')
-        S = KNet('250m', 19, 's')
-        assert(N._validate_coordinate(0, -1) == False)
-        assert(N._validate_coordinate(-1, 500000) == False)
-        assert(N._validate_coordinate(-1, -1) == False)
-
-        for P in self.Pn:
-            assert(N._validate_coordinate(P[0], P[1]) == True)
-        for P in self.Ps:
-            assert(S._validate_coordinate(P[0], P[1]) == True)
-
     def test_tilename_from_point(self):
-        K100m = KNet('100m', 32, 'N')
-        K250m = KNet('250m', 32, 'N')
 
         P = self.Pn[0]
-        assert(K100m.tilename_from_point(-1, -1) == None)
-        assert(K100m.tilename_from_point(P[0], P[1]) == '100m_62238_5757')
-        assert(K250m.tilename_from_point(P[0], P[1]) == '250m_622400_57575')
+        assert_raises(ValueError, tilename_from_point, -1, -1)
+
+        assert(tilename_from_point(P[0], P[1], tile_size='100km') == '100km_62_5')
+        assert(tilename_from_point(P[0], P[1], tile_size='50km') == '50km_620_55')
+        assert(tilename_from_point(P[0], P[1], tile_size='10km') == '10km_622_57')
+        assert(tilename_from_point(P[0], P[1], tile_size='1km') == '1km_6223_575')
+        assert(tilename_from_point(P[0], P[1], tile_size='100m') == '100m_62237_5756')
+        assert(tilename_from_point(P[0], P[1], tile_size='250m') == '250m_622375_57550')
 
