@@ -34,44 +34,46 @@ class TestKNet(object):
     def test_enarge_ordinate2(self):
         knet._enlarge_ordinate(2342, '5km')
 
-    def test_tilename_from_point(self):
+    def test_name_from_point(self):
 
         P = self.Pn[0]
-        assert_raises(ValueError, knet.tilename_from_point, -1, -1)
+        assert_raises(ValueError, knet.name_from_point, -1, -1)
+        assert(knet.name_from_point(P[0], P[1], unit='100km') == '100km_62_5')
+        assert(knet.name_from_point(P[0], P[1], unit='50km') == '50km_620_55')
+        assert(knet.name_from_point(P[0], P[1], unit='10km') == '10km_622_57')
+        assert(knet.name_from_point(P[0], P[1], unit='1km') == '1km_6223_575')
+        assert(knet.name_from_point(P[0], P[1], unit='100m') == '100m_62237_5756')
+        assert(knet.name_from_point(P[0], P[1], unit='250m') == '250m_622375_57550')
 
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='100km') == '100km_62_5')
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='50km') == '50km_620_55')
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='10km') == '10km_622_57')
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='1km') == '1km_6223_575')
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='100m') == '100m_62237_5756')
-        assert(knet.tilename_from_point(P[0], P[1], tile_size='250m') == '250m_622375_57550')
+    def test_validate_name(self):
+        assert(knet.validate_name('1km_2342_234') == True)
+        assert(knet.validate_name('250m_622375_57550') == True)
+        assert(knet.validate_name('100m_62237_5756') == True)
+        assert(knet.validate_name('10km_622_57') == True)
+        assert(knet.validate_name('50km_620_55') == True)
+        assert(knet.validate_name('100km_62_5') == True)
 
-    def test_validate_tilename(self):
-        assert(knet.validate_tilename('1km_2342_234') == True)
-        assert(knet.validate_tilename('250m_622375_57550') == True)
-        assert(knet.validate_tilename('100m_62237_5756') == True)
-        assert(knet.validate_tilename('10km_622_57') == True)
-        assert(knet.validate_tilename('50km_620_55') == True)
-        assert(knet.validate_tilename('100km_62_5') == True)
+        assert(knet.validate_name('2km_232_23') == False)
+        assert(knet.validate_name('100km_234_23') == False)
+        assert(knet.validate_name('10km_23a_53') == False)
+        assert(knet.validate_name('notevenatile') == False)
 
-        assert(knet.validate_tilename('2km_232_23') == False)
-        assert(knet.validate_tilename('100km_234_23') == False)
-        assert(knet.validate_tilename('10km_23a_53') == False)
-        assert(knet.validate_tilename('notevenatile') == False)
-
-    def test_extent_from_tilename(self):
-        xt = knet.extent_from_tilename('1km_6223_575')
+    def test_extent_from_name(self):
+        xt = knet.extent_from_name('1km_6223_575')
         assert(xt == (575000, 6223000, 576000, 6224000))
-        xt = knet.extent_from_tilename('10km_622_57')
+        xt = knet.extent_from_name('10km_622_57')
         assert(xt == (570000, 6220000, 580000, 6230000))
 
 
-    def test_wkt_from_tilename(self):
-        wkt = knet.wkt_from_tilename('1km_6223_575')
-        expected_wkt = 'POLYGON((575000.00 6223000.00, 575000.00 6224000.00, 576000.00 6224000.00, '
-        expected_wkt+= '576000.00 6223000.00, 575000.00 6223000.00))'
+    def test_wkt_from_name(self):
+        wkt = knet.wkt_from_name('1km_6223_575')
+        expected_wkt = 'POLYGON((575000.00 6223000.00,575000.00 6224000.00,576000.00 6224000.00,'
+        expected_wkt+= '576000.00 6223000.00,575000.00 6223000.00))'
+        print(wkt)
+        print(expected_wkt)
         assert(wkt == expected_wkt)
 
     def test_parent_tile(self):
         assert(knet.parent_tile('1km_6223_575', '10km') == '10km_622_57')
-        assert(knet.parent_tile('100m_62237_5756', '250m') == '250m_622375_57550')
+        print(knet.parent_tile('100m_62237_5756', '250m'))
+        assert(knet.parent_tile('100m_62237_5756', '250m') == '250m_622350_57550')
