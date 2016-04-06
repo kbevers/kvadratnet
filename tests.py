@@ -37,11 +37,18 @@ def test_enlarge_ordinate():
     assert kvadratnet._enlarge_ordinate(620, '50km') == 6200000
     assert kvadratnet._enlarge_ordinate(62, '100km') == 6200000
 
+def test_parse_name():
+    """kvadratnet._parse_name"""
+
+    assert_raises(ValueError, kvadratnet._parse_name, 'BadName')
+    assert kvadratnet._parse_name('1km_6234_234') == (6234000, 234000, 1000, '1km')
+
 def test_name_from_point():
     """kvadratnet.name_from_point"""
 
     point = (6223777, 575617)
     assert_raises(ValueError, kvadratnet.name_from_point, -1, -1)
+    assert_raises(ValueError, kvadratnet.name_from_point, point[0], point[1], '23km')
     assert kvadratnet.name_from_point(point[0], point[1], unit='100km') == '100km_62_5'
     assert kvadratnet.name_from_point(point[0], point[1], unit='50km') == '50km_620_55'
     assert kvadratnet.name_from_point(point[0], point[1], unit='10km') == '10km_622_57'
@@ -77,6 +84,7 @@ def test_validate_name():
 def test_extent_from_name():
     """kvadratnet.extent_from_name"""
 
+    assert_raises(ValueError, kvadratnet.extent_from_name, 'BadName')
     extent = kvadratnet.extent_from_name('1km_6223_575')
     assert extent == (575000, 6223000, 576000, 6224000)
     extent = kvadratnet.extent_from_name('10km_622_57')
