@@ -14,80 +14,76 @@
 Test suite for the kvadratnet module.
 """
 
-from nose.tools import assert_raises, raises
+from nose.tools import assert_raises
 import kvadratnet
 
-class Testkvadratnet(object):
-    def setUp(self):
-        self.tile_sizes = ['100m', '250m', '1km', '10km', '100km']
+# pylint: disable=protected-access
+# we want to test protected functions without pylint complaining
 
-        # Some valid coordinates from both hemispheres
-        self.Pn = [(6223777, 575617),  # Aarhus, Denmark
-                   (7894489, 457373),  # Nordkap, Norway
-                   (8598903, 494465)]  # Thule, Greenland
+def test_reduce_ordinate():
+    """kvadratnet._reduce_ordinate"""
 
-        self.Ps = [(3794420, 608144),  # Cape Horn, Chile
-                   (8501476, 179542)]  # Cusco, Peru
+    assert_raises(ValueError, kvadratnet._reduce_ordinate, 6223700, '300m')
 
-    def tearDown(self):
-        pass
+def test_enlarge_ordinate():
+    """kvadratnet._enlarge_ordinate"""
 
-    @raises(ValueError)
-    def test_reduce_ordinate(self):
-        kvadratnet._reduce_ordinate(6223700, '300m')
+    assert_raises(ValueError, kvadratnet._enlarge_ordinate, 2342, '5km')
+    assert kvadratnet._enlarge_ordinate(62237, '100m') == 6223700
+    assert kvadratnet._enlarge_ordinate(622375, '250m') == 6223750
+    assert kvadratnet._enlarge_ordinate(6432, '1km') == 6432000
+    assert kvadratnet._enlarge_ordinate(57, '10km') == 570000
+    assert kvadratnet._enlarge_ordinate(620, '50km') == 6200000
+    assert kvadratnet._enlarge_ordinate(62, '100km') == 6200000
 
-    def test_enlarge_ordinate(self):
-        assert kvadratnet._enlarge_ordinate(62237, '100m') == 6223700
-        assert(kvadratnet._enlarge_ordinate(622375, '250m') == 6223750)
-        assert(kvadratnet._enlarge_ordinate(6432, '1km') == 6432000)
-        assert(kvadratnet._enlarge_ordinate(57, '10km') == 570000)
-        assert(kvadratnet._enlarge_ordinate(620, '50km') == 6200000)
-        assert(kvadratnet._enlarge_ordinate(62, '100km') == 6200000)
+def test_name_from_point():
+    """kvadratnet.name_from_point"""
 
-    @raises(ValueError)
-    def test_enarge_ordinate2(self):
-        kvadratnet._enlarge_ordinate(2342, '5km')
+    point = (6223777, 575617)
+    assert_raises(ValueError, kvadratnet.name_from_point, -1, -1)
+    assert kvadratnet.name_from_point(point[0], point[1], unit='100km') == '100km_62_5'
+    assert kvadratnet.name_from_point(point[0], point[1], unit='50km') == '50km_620_55'
+    assert kvadratnet.name_from_point(point[0], point[1], unit='10km') == '10km_622_57'
+    assert kvadratnet.name_from_point(point[0], point[1], unit='1km') == '1km_6223_575'
+    assert kvadratnet.name_from_point(point[0], point[1], unit='100m') == '100m_62237_5756'
+    assert kvadratnet.name_from_point(point[0], point[1], unit='250m') == '250m_622375_57550'
 
-    def test_name_from_point(self):
+def test_validate_name():
+    """kvadratnet.validate_name"""
 
-        P = self.Pn[0]
-        assert_raises(ValueError, kvadratnet.name_from_point, -1, -1)
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='100km') == '100km_62_5')
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='50km') == '50km_620_55')
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='10km') == '10km_622_57')
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='1km') == '1km_6223_575')
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='100m') == '100m_62237_5756')
-        assert(kvadratnet.name_from_point(P[0], P[1], unit='250m') == '250m_622375_57550')
+    assert kvadratnet.validate_name('1km_2342_234')
+    assert kvadratnet.validate_name('250m_622375_57550')
+    assert kvadratnet.validate_name('100m_62237_5756')
+    assert kvadratnet.validate_name('10km_622_57')
+    assert kvadratnet.validate_name('50km_620_55')
+    assert kvadratnet.validate_name('100km_62_5')
 
-    def test_validate_name(self):
-        assert(kvadratnet.validate_name('1km_2342_234') == True)
-        assert(kvadratnet.validate_name('250m_622375_57550') == True)
-        assert(kvadratnet.validate_name('100m_62237_5756') == True)
-        assert(kvadratnet.validate_name('10km_622_57') == True)
-        assert(kvadratnet.validate_name('50km_620_55') == True)
-        assert(kvadratnet.validate_name('100km_62_5') == True)
+    assert not kvadratnet.validate_name('2km_232_23')
+    assert not kvadratnet.validate_name('100km_234_23')
+    assert not kvadratnet.validate_name('10km_23a_53')
+    assert not kvadratnet.validate_name('notevenatile')
 
-        assert(kvadratnet.validate_name('2km_232_23') == False)
-        assert(kvadratnet.validate_name('100km_234_23') == False)
-        assert(kvadratnet.validate_name('10km_23a_53') == False)
-        assert(kvadratnet.validate_name('notevenatile') == False)
+def test_extent_from_name():
+    """kvadratnet.extent_from_name"""
 
-    def test_extent_from_name(self):
-        xt = kvadratnet.extent_from_name('1km_6223_575')
-        assert(xt == (575000, 6223000, 576000, 6224000))
-        xt = kvadratnet.extent_from_name('10km_622_57')
-        assert(xt == (570000, 6220000, 580000, 6230000))
+    extent = kvadratnet.extent_from_name('1km_6223_575')
+    assert extent == (575000, 6223000, 576000, 6224000)
+    extent = kvadratnet.extent_from_name('10km_622_57')
+    assert extent == (570000, 6220000, 580000, 6230000)
 
+def test_wkt_from_name():
+    """kvadratnet.wkt_from_name"""
 
-    def test_wkt_from_name(self):
-        wkt = kvadratnet.wkt_from_name('1km_6223_575')
-        expected_wkt = 'POLYGON((575000.00 6223000.00,575000.00 6224000.00,576000.00 6224000.00,'
-        expected_wkt+= '576000.00 6223000.00,575000.00 6223000.00))'
-        print(wkt)
-        print(expected_wkt)
-        assert(wkt == expected_wkt)
+    wkt = kvadratnet.wkt_from_name('1km_6223_575')
+    expected_wkt = 'POLYGON((575000.00 6223000.00,575000.00 6224000.00,576000.00 6224000.00,'
+    expected_wkt += '576000.00 6223000.00,575000.00 6223000.00))'
+    print(wkt)
+    print(expected_wkt)
+    assert wkt == expected_wkt
 
-    def test_parent_tile(self):
-        assert(kvadratnet.parent_tile('1km_6223_575', '10km') == '10km_622_57')
-        print(kvadratnet.parent_tile('100m_62237_5756', '250m'))
-        assert(kvadratnet.parent_tile('100m_62237_5756', '250m') == '250m_622350_57550')
+def test_parent_tile():
+    """kvadratnet.parent_tile"""
+
+    assert kvadratnet.parent_tile('1km_6223_575', '10km') == '10km_622_57'
+    print(kvadratnet.parent_tile('100m_62237_5756', '250m'))
+    assert kvadratnet.parent_tile('100m_62237_5756', '250m') == '250m_622350_57550'
