@@ -2,6 +2,9 @@
 
 Kvadratnet is a set of tools that makes working with the Danish Kvadratnet easier.
 
+[![Build Status](https://travis-ci.org/kbevers/kvadratnet.svg?branch=master)](https://travis-ci.org/kbevers/kvadratnet)
+
+
 ## Installation
 
 Installation can be done either via
