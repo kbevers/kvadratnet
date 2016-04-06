@@ -3,6 +3,7 @@
 Kvadratnet is a set of tools that makes working with the Danish Kvadratnet easier.
 
 [![Build Status](https://travis-ci.org/kbevers/kvadratnet.svg?branch=master)](https://travis-ci.org/kbevers/kvadratnet)
+[![Coverage Status](https://coveralls.io/repos/github/kbevers/kvadratnet/badge.svg?branch=master)](https://coveralls.io/github/kbevers/kvadratnet?branch=master)
 
 
 ## Installation
