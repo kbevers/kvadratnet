@@ -5,4 +5,11 @@ python:
   - "3.4"
   - "3.5"
 
-script: nosetests
+install:
+  - pip install coveralls
+  - pip install coverage
+
+script: nosetests --with-coverage
+
+after_success:
+  - coveralls
