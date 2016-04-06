@@ -15,6 +15,7 @@ Test suite for the kvadratnet module.
 """
 
 from nose.tools import assert_raises
+
 import kvadratnet
 
 # pylint: disable=protected-access
@@ -58,10 +59,20 @@ def test_validate_name():
     assert kvadratnet.validate_name('50km_620_55')
     assert kvadratnet.validate_name('100km_62_5')
 
+    assert kvadratnet.validate_name('50km_620_55', units='50km')
+
+    assert kvadratnet.validate_name('1km_2342_523', units=['1km', '250m'])
+    assert kvadratnet.validate_name('1km_2342_523', units=['1km', '250m'], strict=True)
+
+    assert not kvadratnet.validate_name('1km_2342_523', units=['10km', '250m'], strict=True)
+    assert not kvadratnet.validate_name('DTM_1km_5233_782.tif', strict=True)
+
     assert not kvadratnet.validate_name('2km_232_23')
     assert not kvadratnet.validate_name('100km_234_23')
     assert not kvadratnet.validate_name('10km_23a_53')
     assert not kvadratnet.validate_name('notevenatile')
+
+    assert_raises(ValueError, kvadratnet.validate_name, '1km_4141_524', ['59km', '1000km'])
 
 def test_extent_from_name():
     """kvadratnet.extent_from_name"""
