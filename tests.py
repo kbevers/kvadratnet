@@ -1,4 +1,20 @@
-from nose.tools import *
+# Permission to use, copy, modify, and/or distribute this
+# software for any purpose with or without fee is hereby granted,
+# provided that the above copyright notice and this permission
+# notice appear in all copies.
+#
+# THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL
+# WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL
+# THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR
+# CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+# LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF
+# CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+""""
+Test suite for the kvadratnet module.
+"""
+
+from nose.tools import assert_raises, raises
 import kvadratnet
 
 class Testkvadratnet(object):
@@ -21,7 +37,7 @@ class Testkvadratnet(object):
         kvadratnet._reduce_ordinate(6223700, '300m')
 
     def test_enlarge_ordinate(self):
-        assert(kvadratnet._enlarge_ordinate(62237, '100m') == 6223700)
+        assert kvadratnet._enlarge_ordinate(62237, '100m') == 6223700
         assert(kvadratnet._enlarge_ordinate(622375, '250m') == 6223750)
         assert(kvadratnet._enlarge_ordinate(6432, '1km') == 6432000)
         assert(kvadratnet._enlarge_ordinate(57, '10km') == 570000)
