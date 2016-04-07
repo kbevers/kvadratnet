@@ -11,9 +11,9 @@ def readme():
     """
     try:
         import pypandoc
-        return pypandoc.convert('README.md', 'rst', format='md')
+        return pypandoc.convert('readme..md', 'rst', format='md')
     except (IOError, ImportError):
-        with open('README.md') as f:
+        with open('readme.md') as f:
             return f.read()
 
 setup(name='kvadratnet',
@@ -34,4 +34,6 @@ setup(name='kvadratnet',
       author_email='kristianevers@gmail.com',
       download_url='https://github.com/kbevers/kvadratnet/tarball/0.1',
       license='ISC',
-      py_modules=['kvadratnet'])
+      py_modules=['kvadratnet'],
+      test_suite='nose.collector',
+      tests_require=['nose'])
