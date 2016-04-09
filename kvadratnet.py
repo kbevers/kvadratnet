@@ -61,6 +61,13 @@ TILE_FACTORS = {'100m': 100,
                 '50km': 10000,
                 '100km': 100000}
 
+REGEX = {'100m': '100m_[0-9]{5}_[0-9]{4}',
+         '250m': '250m_[0-9]{6}_[0-9]{5}',
+         '1km': '1km_[0-9]{4}_[0-9]{3}',
+         '10km': '10km_[0-9]{3}_[0-9]{2}',
+         '50km': '50km_[0-9]{3}_[0-9]{2}',
+         '100km': '100km_[0-9]{2}_[0-9]'}
+
 TileInfo = namedtuple('TileInfo', 'northing, easting, size, unit')
 TileExtent = namedtuple('TileExtent', 'min_easting, min_northing, max_easting, max_northing')
 
@@ -149,7 +156,6 @@ def name_from_point(northing, easting, unit='1km'):
     reduced_easting = _reduce_ordinate(easting, unit)
     return '{0}_{1}_{2}'.format(unit, reduced_northing, reduced_easting)
 
-
 def validate_name(name, units=None, strict=False):
     """Check if a tile name is valid.
 
@@ -158,6 +164,9 @@ def validate_name(name, units=None, strict=False):
         units:      Unit descriptor or list of unit descriptors to validate against
         strict:     When True names are only valid if the are an exact match,
                     i.e. '1km_6234_423' and not 'DTM_1km_6234_423.tif'
+
+    Returns:
+        Boolean
     """
 
     if not units:
@@ -170,24 +179,38 @@ def validate_name(name, units=None, strict=False):
         if unit not in TILE_SIZES.keys():
             raise ValueError('{0} is not a valid kvadratnet unit.'.format(unit))
 
-    regex = {'100m': '100m_[0-9]{5}_[0-9]{4}',
-             '250m': '250m_[0-9]{6}_[0-9]{5}',
-             '1km': '1km_[0-9]{4}_[0-9]{3}',
-             '10km': '10km_[0-9]{3}_[0-9]{2}',
-             '50km': '50km_[0-9]{3}_[0-9]{2}',
-             '100km': '100km_[0-9]{2}_[0-9]'}
-
     if strict:
         begin, end = '^', '$'
     else:
         begin, end = '', ''
 
     for unit in units:
-        expr = '{begin}{expr}{end}'.format(begin=begin, expr=regex[unit], end=end)
+        expr = '{begin}{expr}{end}'.format(begin=begin, expr=REGEX[unit], end=end)
         if re.match(expr, name):
             return True
 
     return False
+
+def tile_name(string):
+    """
+    Return only the tile name from a string, e.g. a filename.
+
+    Arguments:
+        String:         String containing a tile identifier.
+
+    Returns:
+        First detected tile name identifier in string.
+
+    Raises:
+        ValueError:     If a tile name identifier was not detected
+                        a ValueError exception is raised.
+    """
+    for expr in REGEX.values():
+        match = re.search(expr, string)
+        if match:
+            return match.group()
+    else:
+        raise ValueError('Tile name identier not detected in string')
 
 def extent_from_name(name):
     """Converts a generic string with a tile name into a bounding box."""

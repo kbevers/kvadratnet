@@ -106,3 +106,12 @@ def test_parent_tile():
     assert kvadratnet.parent_tile('1km_6223_575', '10km') == '10km_622_57'
     print(kvadratnet.parent_tile('100m_62237_5756', '250m'))
     assert kvadratnet.parent_tile('100m_62237_5756', '250m') == '250m_622350_57550'
+
+def test_tile_name():
+    """kvadratnet.tile_name"""
+    name = kvadratnet.tile_name('dtm_1km_5232_624.tif')
+    print(name)
+    assert name == '1km_5232_624'
+
+    assert_raises(ValueError, kvadratnet.tile_name, 'not_a_tile_name')
+
