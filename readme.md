@@ -28,7 +28,7 @@ Examples of tile identifiers can be seen in the table below:
 |  100km    | 100km_62_5        |
 |  50km     | 50km_620_55       |
 |  10km     | 10km_622_57       |
-|  1km      | 1km:6223_576      |
+|  1km      | 1km_6223_576      |
 |  250m     | 250m_622375_57550 |
 |  100m     | 100m_62237_5756   |
 
@@ -43,6 +43,39 @@ By using robust UTM coordinate transformation libraries, such as the Extended Tr
 implementation in ```proj.4```.
 This exact procedure is used by the Grenland Survey, [Asiaq](http://www.asiaq.gl/), which organizes
 data across 10 UTM zones.
+
+## Example
+
+Example of using kvadratnet.py
+
+Suppose you have a range of files organized in the 1km network.
+We want to count how many 1km tiles are present in each parent
+10km tile.
+
+```
+from collections import Counter
+import kvadratnet
+
+files = ['dtm_1km_6121_867.tif', 'dtm_1km_6125_866.tif',
+         'dtm_1km_6125_862.tif', 'dtm_1km_6423_512.tif',
+         'dtm_1km_6253_234.tif', 'dtm_1km_6235_634.tif',
+         'dtm_1km_6424_513.tif', 'dtm_lkm_5223_523.tif',
+         'dtm_1km_6251_236.tif', 'dtm_1km_6424_517.til']
+
+counter = Counter()
+
+for filename in files:
+    try:
+        name = kvadratnet.tile_name(filename)
+    except:
+        counter['bad_name'] += 1
+    parent = kvadratnet.parent_tile(name, '10km')
+    counter[parent] += 1
+
+print(counter)
+# Counter({'10km_642_51': 4, '10km_612_86': 3, '10km_625_23': 2, '10km_623_63': 1, 'bad_name': 1}) 
+```
+
 
 ## Installation
 
