@@ -11,7 +11,7 @@ The Danish Kvadratnet is a geographical tiling scheme based on UTM coordinates.
 The tiling scheme is a national standard for dividing nation-wide geographical
 datasets into smaller pieces.
 
-Originally created as collaboration between the [Statitics Denmark](http://dst.dk/) and
+Originally created as collaboration between [Statitics Denmark](http://dst.dk/) and the
 [National Survey and Cadastre of Denmark](http://sdfe.dk/) the Danish Kvadratnet was created
 as a static administrative subdivision, since using municipal boundaries etc. has been know
 to change and are therefore not suitable as a geographical administrative index.
@@ -40,7 +40,8 @@ coordinates are duplicated across zones.
 This can be solved by keeping all data in the same UTM zone, even though some of it might
 be placed outside the zone.
 By using robust UTM coordinate transformation libraries, such as the Extended Transverse Mercator
-implementation in ```proj.4```.
+implementation in ```proj.4```, data can be kept in the same coordinate system
+even though it spans several UTM zones.
 This exact procedure is used by the Grenland Survey, [Asiaq](http://www.asiaq.gl/), which organizes
 data across 10 UTM zones.
 
@@ -52,7 +53,7 @@ Suppose you have a range of files organized in the 1km network.
 We want to count how many 1km tiles are present in each parent
 10km tile.
 
-```
+```python
 from collections import Counter
 import kvadratnet
 
@@ -73,7 +74,7 @@ for filename in files:
     counter[parent] += 1
 
 print(counter)
-# Counter({'10km_642_51': 4, '10km_612_86': 3, '10km_625_23': 2, '10km_623_63': 1, 'bad_name': 1}) 
+# Counter({'10km_642_51': 4, '10km_612_86': 3, '10km_625_23': 2, '10km_623_63': 1, 'bad_name': 1})
 ```
 
 
