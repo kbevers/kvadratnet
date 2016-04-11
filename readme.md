@@ -61,7 +61,7 @@ files = ['dtm_1km_6121_867.tif', 'dtm_1km_6125_866.tif',
          'dtm_1km_6125_862.tif', 'dtm_1km_6423_512.tif',
          'dtm_1km_6253_234.tif', 'dtm_1km_6235_634.tif',
          'dtm_1km_6424_513.tif', 'dtm_lkm_5223_523.tif',
-         'dtm_1km_6251_236.tif', 'dtm_1km_6424_517.til']
+         'dtm_1km_6251_236.tif', 'dtm_1km_6424_517.tif']
 
 counter = Counter()
 
