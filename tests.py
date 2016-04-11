@@ -115,3 +115,30 @@ def test_tile_name():
 
     assert_raises(ValueError, kvadratnet.tile_name, 'not_a_tile_name')
 
+def test_tile_to_index():
+    """kvadratnet.tile_to_index"""
+    name = '1km_6232_623'
+    idy, idx = kvadratnet.tile_to_index(name, 6200000, 600000)
+    print(name, idy, idx)
+    assert (idy, idx) == (-32, 23)
+
+    name = '1km_6200_600'
+    idy, idx = kvadratnet.tile_to_index(name, 6200000, 600000)
+    print(name, idy, idx)
+    assert (idy, idx) == (0, 0)
+
+    name = '1km_6200_600'
+    idy, idx = kvadratnet.tile_to_index(name, 6200123, 600123)
+    print(name, idy, idx)
+    assert (idy, idx) == (0, 0)
+
+    name = '1km_6201_599'
+    idy, idx = kvadratnet.tile_to_index(name, 6200000, 600000)
+    print(name, idy, idx)
+    assert (idy, idx) == (-1, -1)
+
+    name = '250m_622375_57550'
+    idy, idx = kvadratnet.tile_to_index(name, 6223750, 575500)
+    print(name, idy, idx)
+    assert (idy, idx) == (0, 0)
+

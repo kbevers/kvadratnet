@@ -243,3 +243,44 @@ def parent_tile(name, parent_unit):
     tile = _parse_name(name)
     return name_from_point(tile.northing, tile.easting, parent_unit)
 
+def tile_to_index(name, northing_origin, easting_origin):
+    """
+    Create indices from tilename.
+
+    Returns a 2D index, (i,j), that is increasing in the eastern direction
+    and decreasing in the northern direction. This behaviour is emulating
+    that of images files, where the origo is in the top left corner.
+    Depending on your origin offsets you might get negative indices. This
+    is by design. Usually you would out your origin coordinates in the midle
+    of the area your are working in.
+    Origin coordinates are given in the same unit as the tiles you are using.
+    For instance using (6200, 600) as origin for the 1km_6232_623 tile will
+    give you an index of (-32, 23).
+
+    Any origin coordinate can be used, but it will be rounded to the nearest
+    multiple of the tile unit, i.e. (6200342, 600421) will be rounded to
+    (6200000, 600000)
+
+    Arguments:
+
+        name:               Tile name
+        northing_origin:    Northing coordinate of index origin. In same units
+                            as tile.
+        easting_origin:     Easting coordinate of index origin. In same units
+                            as tile.
+    Returns:
+        2D-index
+    """
+    if not validate_name(name):
+        raise ValueError('Invalid tile name')
+
+    tile = _parse_name(name)
+
+    # round origin to nearest multiple of tile unit
+    easting_rounded = round(easting_origin/tile.size)*tile.size
+    northing_rounded= round(northing_origin/tile.size)*tile.size
+
+    j = (tile.easting - easting_rounded) / tile.size
+    i = (northing_rounded - tile.northing) / tile.size
+
+    return i,j
