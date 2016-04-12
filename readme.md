@@ -11,10 +11,12 @@ The Danish Kvadratnet is a geographical tiling scheme based on UTM coordinates.
 The tiling scheme is a national standard for dividing nation-wide geographical
 datasets into smaller pieces.
 
-Originally created as collaboration between [Statitics Denmark](http://dst.dk/) and the
-[National Survey and Cadastre of Denmark](http://sdfe.dk/) the Danish Kvadratnet was created
-as a static administrative subdivision, since using municipal boundaries etc. has been know
-to change and are therefore not suitable as a geographical administrative index.
+The Danish Kvadratnet was originally created as a collaboration between
+[Statitics Denmark](http://dst.dk/) and the [National Survey and Cadastre of Denmark](http://sdfe.dk/)
+as a static administrative geographical subdivision of the country.
+The reasoning behind this was that usual administrative boundaries, such as municipal boundaries,
+are known to change from time to time and are therefore not very suitable as a geographical
+administrative index.
 
 The Danish Kvadratnet consist of a several **networks** that covers the country with square tiles
 of varying sizes.
