@@ -28,6 +28,9 @@ setup(name='kvadratnet',
           'Topic :: Scientific/Engineering :: GIS',
           'Topic :: Utilities'
       ],
+      entry_points = {
+          'console_scripts': ['knet=knet:main']
+      },
       keywords='kvadratnet gis tiling',
       url='https://github.com/kbevers/kvadratnet',
       author='Kristian Evers',
