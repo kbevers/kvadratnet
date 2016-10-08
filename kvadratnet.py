@@ -126,16 +126,18 @@ def _enlarge_ordinate(ordinate, unit='1km'):
 
     return factor*int(ordinate)
 
-def _parse_name(name):
+def _parse_name(string):
     """
     Converts tile name to northing, easting, tile unit and tile size in meters.
 
     Arguments:
-      name:         Name of kvadranet tile
+      string:         String containing a kvadranet tile identifie identifier
 
     Returns:
       namedtuple with members northing, easting, size and unit
     """
+
+    name = tile_name(string)
 
     if not validate_name(name):
         raise ValueError('Not a valid tile name!')
@@ -237,7 +239,7 @@ def extent_from_name(name):
         namedtuple with members min_easting, min_northing, max_easting, max_northing
     """
     if not validate_name(name):
-        raise ValueError('Not a valid tile name')
+        raise ValueError('Not a valid tile name: {name}'.format(name=name))
 
     tile = _parse_name(name)
 

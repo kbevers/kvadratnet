@@ -42,6 +42,7 @@ def test_parse_name():
 
     assert_raises(ValueError, kvadratnet._parse_name, 'BadName')
     assert kvadratnet._parse_name('1km_6234_234') == (6234000, 234000, 1000, '1km')
+    assert kvadratnet._parse_name('punktsky_1km_6234_234.laz') == (6234000, 234000, 1000, '1km')
 
 def test_name_from_point():
     """kvadratnet.name_from_point"""
