@@ -4,6 +4,8 @@ Setup script for the kvadratnet module.
 
 from setuptools import setup
 
+import kvadratnet
+
 def readme():
     """
     Return a properly formatted readme text, if possible, that can be used
@@ -17,7 +19,7 @@ def readme():
             return f.read()
 
 setup(name='kvadratnet',
-      version='0.1',
+      version=kvadratnet.__version__,
       description='Python tools for working with the Danish Kvadratnet tiling scheme.',
       long_description=readme(),
       classifiers=[
