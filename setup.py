@@ -2,6 +2,8 @@
 Setup script for the kvadratnet module.
 """
 
+import os
+import subprocess
 from setuptools import setup
 
 import kvadratnet
@@ -11,12 +13,12 @@ def readme():
     Return a properly formatted readme text, if possible, that can be used
     as the long description for setuptools.setup.
     """
-    try:
-        import pypandoc
-        return pypandoc.convert('readme..md', 'rst', format='md')
-    except (IOError, ImportError):
-        with open('readme.md') as f:
-            return f.read()
+    # This will fail if pandoc is not in system path.
+    subprocess.call(['pandoc', 'readme.md', '--from', 'markdown', '--to', 'rst', '-s', '-o', 'readme.rst'])
+    with open('readme.rst') as f:
+        readme = f.read()
+    os.remove('readme.rst')
+    return readme
 
 setup(name='kvadratnet',
       version=kvadratnet.__version__,

@@ -45,7 +45,7 @@ import math
 from collections import namedtuple
 import re
 
-__version__ = '0.2.0'
+__version__ = '0.2.1'
 
 # actual size of tiles. In meters.
 TILE_SIZES = {'100m': 100,
