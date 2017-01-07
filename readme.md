@@ -12,7 +12,7 @@ The tiling scheme is a national standard for dividing nation-wide geographical
 datasets into smaller pieces.
 
 The Danish Kvadratnet was originally created as a collaboration between
-[Statitics Denmark](http://dst.dk/) and the [National Survey and Cadastre of Denmark](http://sdfe.dk/)
+[Statistics Denmark](http://dst.dk/) and the [National Survey and Cadastre of Denmark](http://sdfe.dk/)
 as a static administrative geographical subdivision of the country.
 The reasoning behind this was that usual administrative boundaries, such as municipal boundaries,
 are known to change from time to time and are therefore not very suitable as a geographical
@@ -49,7 +49,7 @@ data across 10 UTM zones.
 
 ## Example
 
-Example of using kvadratnet.py
+Example of using ```kvadratnet```
 
 Suppose you have a range of files organized in the 1km network.
 We want to count how many 1km tiles are present in each parent
@@ -85,7 +85,7 @@ print(counter)
 Installation can be done either via
 
 ```
-pip install kvadranet
+pip install kvadratnet
 ```
 
 or by downloading the source code and running
@@ -94,7 +94,7 @@ or by downloading the source code and running
 python setup.py install
 ```
 
-## testing
+## Testing
 
 ```nose``` is used for testing. The test-suite can be invoked by running
 
