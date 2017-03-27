@@ -79,6 +79,28 @@ print(counter)
 # Counter({'10km_642_51': 4, '10km_612_86': 3, '10km_625_23': 2, '10km_623_63': 1, 'bad_name': 1})
 ```
 
+## knet - command line interface
+
+`kvadratnet` also has a command line interface called `knet`.
+The `knet` command is a front for various tools that make life
+managing files with kvadratnet naming a lot easier. For instance
+renaming many files:
+
+```
+# add a prefix before the cell identifier
+$ knet rename --prefix PUNKTSKY_ "*.laz"
+
+# strip anything but the cell identifier
+$ knet rename PUNKTSKY*.laz
+```
+
+With `knet` organizing files in subfolders according to which
+parent tiles they belong to is easy:
+```
+# divide files into 100km and 10km folders
+$ knet organize "1km*.tif" 100km 10km
+```
+
 
 ## Installation
 

@@ -45,7 +45,7 @@ import math
 from collections import namedtuple
 import re
 
-__version__ = '0.2.2'
+__version__ = '0.3.0'
 
 UNITS = ['100m', '250m', '1km', '10km', '50km', '100km']
 
