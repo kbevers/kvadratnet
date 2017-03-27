@@ -285,6 +285,10 @@ def parent_tile(name, parent_unit=''):
 
     Returns:
        Name of parent tile.
+
+    Raises:
+        ValueError:     When a tile has not parent or when the tile is
+                        larger than the request parent.
     """
     tile = _parse_name(name)
     if parent_unit == '':
@@ -305,9 +309,9 @@ def tile_to_index(name, northing_origin, easting_origin):
 
     Returns a 2D index, (i,j), that is increasing in the eastern direction
     and decreasing in the northern direction. This behaviour is emulating
-    that of images files, where the origo is in the top left corner.
+    that of image files, where the origo is in the top left corner.
     Depending on your origin offsets you might get negative indices. This
-    is by design. Usually you would out your origin coordinates in the midle
+    is by design. Usually you would put your origin coordinates in the midle
     of the area your are working in.
     Origin coordinates are given in the same unit as the tiles you are using.
     For instance using (6200, 600) as origin for the 1km_6232_623 tile will
