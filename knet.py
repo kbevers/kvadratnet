@@ -3,6 +3,8 @@ Command line utils for kvadratnet.
 """
 
 import os
+import sys
+import shutil
 import glob
 import argparse
 
@@ -42,6 +44,48 @@ def run_rename(args):
             print('Renaming {src} to {dst}'.format(src=base+ext, dst=new_filename))
         os.rename(f, dst)
 
+def run_organize(args):
+    """
+    Organize files in folders according to a chosen kvadratnet-level.
+    """
+    # are input units known?
+    units = args.unit_list.split(',')
+    for unit in units:
+        if not unit in kvadratnet.UNITS:
+            raise ValueError('Unknown unit in units list ({unit})'.format(unit))
+
+    files = glob.glob(args.filespec)
+
+    for f in files:
+        (_, filename) = os.path.split(f)
+        (base, ext) = os.path.splitext(filename)
+
+        try:
+            tilename = kvadratnet.tile_name(base)
+        except ValueError:
+            if args.verbose:
+                print('{}: No kvadratnet tile name found. Skipping.'.format(f))
+            continue
+
+        sub_dirs = []
+        for unit in reversed(kvadratnet.UNITS):
+            if not unit in units:
+                continue
+            try:
+                sub_dirs.append(kvadratnet.parent_tile(tilename, unit))
+            except ValueError:
+                print('ERROR: {0} is smaller than {1}'.format(unit, tilename))
+                sys.exit(1)
+
+        folder = '\\'.join(sub_dirs)
+        try:
+            os.makedirs(folder)
+        except OSError:
+            pass
+
+        dst = os.path.join(folder, filename)
+        print('Moving {filename} into {folder}'.format(filename=filename, folder=folder))
+        shutil.move(f, dst)
 
 
 def main():
@@ -98,6 +142,24 @@ def main():
         help='Be verbose',
     )
     rename.set_defaults(func=run_rename)
+
+    organize = subparsers.add_parser(
+        'organize',
+        help = '''Organize files into subfolders according to supplied
+                  list of tile units.''',
+    )
+    organize.add_argument('filespec', help='Files to move into subfolders. Globbing expression')
+    organize.add_argument(
+        'unit_list',
+        help='Comma separated list of unit-folders to subdivide files into',
+    )
+    organize.add_argument(
+        '--verbose',
+        '-v',
+        action='store_true',
+        help='Be verbose',
+    )
+    organize.set_defaults(func=run_organize)
 
     args = parser.parse_args()
     args.func(args)
