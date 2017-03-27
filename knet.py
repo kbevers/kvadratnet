@@ -34,8 +34,7 @@ def run_rename(args):
         try:
             tilename = kvadratnet.tile_name(base)
         except ValueError:
-            if args.verbose:
-                print('{}: No kvadratnet tile name found. Skipping.'.format(f))
+            print('{}: No kvadratnet tile name found. Skipping.'.format(f))
             continue
 
         new_filename = args.prefix + tilename + args.postfix + ext
@@ -49,7 +48,7 @@ def run_organize(args):
     Organize files in folders according to a chosen kvadratnet-level.
     """
     # are input units known?
-    units = args.unit_list.split(',')
+    units = args.unit
     for unit in units:
         if not unit in kvadratnet.UNITS:
             raise ValueError('Unknown unit in units list ({unit})'.format(unit))
@@ -63,8 +62,7 @@ def run_organize(args):
         try:
             tilename = kvadratnet.tile_name(base)
         except ValueError:
-            if args.verbose:
-                print('{}: No kvadratnet tile name found. Skipping.'.format(f))
+            print('{}: No kvadratnet tile name found. Skipping.'.format(f))
             continue
 
         sub_dirs = []
@@ -77,14 +75,15 @@ def run_organize(args):
                 print('ERROR: {0} is smaller than {1}'.format(unit, tilename))
                 sys.exit(1)
 
-        folder = '\\'.join(sub_dirs)
+        folder = os.path.sep.join(sub_dirs)
         try:
             os.makedirs(folder)
         except OSError:
             pass
 
         dst = os.path.join(folder, filename)
-        print('Moving {filename} into {folder}'.format(filename=filename, folder=folder))
+        if args.verbose:
+            print('Moving {filename} into {folder}'.format(filename=filename, folder=folder))
         shutil.move(f, dst)
 
 
@@ -128,12 +127,12 @@ def main():
     rename.add_argument(
         '--prefix',
         default='',
-        help='Text before kvadratnet cell identifier, eg prefix_1km_6666_444.tif',
+        help='Text before kvadratnet cell identifier, e.g. prefix_1km_6666_444.tif',
     )
     rename.add_argument(
         '--postfix',
         default='',
-        help='Text after kvadratnet cell identifier, eg 1km_6666_444_postfix.tif',
+        help='Text after kvadratnet cell identifier, e.g. 1km_6666_444_postfix.tif',
     )
     rename.add_argument(
         '--verbose',
@@ -150,8 +149,9 @@ def main():
     )
     organize.add_argument('filespec', help='Files to move into subfolders. Globbing expression')
     organize.add_argument(
-        'unit_list',
-        help='Comma separated list of unit-folders to subdivide files into',
+        'unit',
+        nargs='+',
+        help='Unit-folders to subdivide files into. More than one unit can be supplied.',
     )
     organize.add_argument(
         '--verbose',
