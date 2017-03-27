@@ -47,6 +47,8 @@ import re
 
 __version__ = '0.2.2'
 
+UNITS = ['100m', '250m', '1km', '10km', '50km', '100km']
+
 # actual size of tiles. In meters.
 TILE_SIZES = {'100m': 100,
               '250m': 250,
@@ -272,19 +274,29 @@ def wkt_from_name(name):
 
     return wkt
 
-def parent_tile(name, parent_unit):
+def parent_tile(name, parent_unit=''):
     """
     Return parent tile.
 
     Arguments:
         name:           Name of child tile.
         parent_unit:    Unit of the parent tile, must be large than
-                        unit of child tile.
+                        unit of child tile. Optional.
 
     Returns:
        Name of parent tile.
     """
     tile = _parse_name(name)
+    if parent_unit == '':
+        try:
+            parent_unit = UNITS[UNITS.index(tile.unit)+1]
+        except IndexError:
+            # In case we reach the end of UNITS, use the same unit as the original tile input
+            raise ValueError('{tile} has no parent tile.'.format(tile=name))
+
+    if TILE_SIZES[tile.unit] >= TILE_SIZES[parent_unit]:
+        raise ValueError('Child tile unit is larger than or equal to child unit')
+
     return name_from_point(tile.northing, tile.easting, parent_unit)
 
 def tile_to_index(name, northing_origin, easting_origin):
