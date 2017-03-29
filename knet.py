@@ -7,7 +7,8 @@ import sys
 import shutil
 import glob
 import argparse
-
+import fileinput
+from collections import Counter
 import kvadratnet
 
 def run_create(args):
@@ -86,6 +87,34 @@ def run_organize(args):
             print('Moving {filename} into {folder}'.format(filename=filename, folder=folder))
         shutil.move(f, dst)
 
+def run_parents(args):
+    """
+    Create a list of parent tiles from a list of inputs child tiles.
+    """
+    counter = Counter()
+    parents = []
+    for line in args.infile:
+        try:
+            tilename = kvadratnet.tile_name(line.rstrip())
+        except ValueError:
+            pass
+        parent = kvadratnet.parent_tile(tilename)
+        parents.append(parent)
+        counter[parent] += 1
+
+    if args.unique:
+        for key, value in counter.iteritems():
+            if args.count:
+                print("{:<20} {}".format(key, value))
+            else:
+                print(key)
+    else:
+        for parent in parents:
+            if args.count:
+                print("{:<20} {}".format(parent, counter[parent]))
+            else:
+                print(parent)
+
 
 def main():
     """
@@ -160,6 +189,15 @@ def main():
         help='Be verbose',
     )
     organize.set_defaults(func=run_organize)
+
+    parents = subparsers.add_parser(
+        'parents',
+        help='Create a list of parent tiles based on a list of input tiles',
+    )
+    parents.add_argument('infile', nargs='?', type=argparse.FileType('r'), default=sys.stdin)
+    parents.add_argument('--unique', action='store_true', help='Only show unique parents')
+    parents.add_argument('--count', action='store_true', help='Show number of childs for each parent')
+    parents.set_defaults(func=run_parents)
 
     args = parser.parse_args()
     args.func(args)
