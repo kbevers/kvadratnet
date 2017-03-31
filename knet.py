@@ -52,7 +52,7 @@ def run_organize(args):
     units = args.unit
     for unit in units:
         if not unit in kvadratnet.UNITS:
-            raise ValueError('Unknown unit in units list ({unit})'.format(unit))
+            raise ValueError('Unknown unit in units list ({})'.format(unit))
 
     files = glob.glob(args.filespec)
 
@@ -176,7 +176,11 @@ def main():
         help = '''Organize files into subfolders according to supplied
                   list of tile units.''',
     )
-    organize.add_argument('filespec', help='Files to move into subfolders. Globbing expression')
+    organize.add_argument(
+        'filespec',
+        help='''Files to move into subfolders. Globbing expression, e.g. "dtm/*.tif".
+                Remember the quotation marks.'''
+    )
     organize.add_argument(
         'unit',
         nargs='+',
