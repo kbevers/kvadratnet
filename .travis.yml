@@ -9,10 +9,12 @@ python:
 
 before_install:
   - pip install click
+  - pip install pytest
+  - pip install pytest-cov
   - pip install coveralls
   - pip install coverage
 
-script: pytest tests.py --cov
+script: pytest --cov
 
 after_success:
   - coveralls
