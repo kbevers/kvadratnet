@@ -41,37 +41,46 @@ import math
 from collections import namedtuple
 import re
 
-__version__ = '0.3.0'
+__version__ = "0.3.0"
 
-UNITS = ['100m', '250m', '1km', '10km', '50km', '100km']
+UNITS = ["100m", "250m", "1km", "10km", "50km", "100km"]
 
 # actual size of tiles. In meters.
-TILE_SIZES = {'100m': 100,
-              '250m': 250,
-              '1km': 1000,
-              '10km': 10000,
-              '50km': 50000,
-              '100km': 100000}
+TILE_SIZES = {
+    "100m": 100,
+    "250m": 250,
+    "1km": 1000,
+    "10km": 10000,
+    "50km": 50000,
+    "100km": 100000,
+}
 
 # zeros needed to convert N/E in tile name to full coordinate values.
-TILE_FACTORS = {'100m': 100,
-                '250m': 10,
-                '1km': 1000,
-                '10km': 10000,
-                '50km': 10000,
-                '100km': 100000}
+TILE_FACTORS = {
+    "100m": 100,
+    "250m": 10,
+    "1km": 1000,
+    "10km": 10000,
+    "50km": 10000,
+    "100km": 100000,
+}
 
-REGEX = {'100m': '100m_[0-9]{5}_[0-9]{4}',
-         '250m': '250m_[0-9]{6}_[0-9]{5}',
-         '1km': '1km_[0-9]{4}_[0-9]{3}',
-         '10km': '10km_[0-9]{3}_[0-9]{2}',
-         '50km': '50km_[0-9]{3}_[0-9]{2}',
-         '100km': '100km_[0-9]{2}_[0-9]'}
+REGEX = {
+    "100m": "100m_[0-9]{5}_[0-9]{4}",
+    "250m": "250m_[0-9]{6}_[0-9]{5}",
+    "1km": "1km_[0-9]{4}_[0-9]{3}",
+    "10km": "10km_[0-9]{3}_[0-9]{2}",
+    "50km": "50km_[0-9]{3}_[0-9]{2}",
+    "100km": "100km_[0-9]{2}_[0-9]",
+}
 
-TileInfo = namedtuple('TileInfo', 'northing, easting, size, unit')
-TileExtent = namedtuple('TileExtent', 'min_easting, min_northing, max_easting, max_northing')
+TileInfo = namedtuple("TileInfo", "northing, easting, size, unit")
+TileExtent = namedtuple(
+    "TileExtent", "min_easting, min_northing, max_easting, max_northing"
+)
 
-def _reduce_ordinate(ordinate, unit='1km'):
+
+def _reduce_ordinate(ordinate, unit="1km"):
     """
     Reduces UTM ordinate to tile-ordinate.
 
@@ -89,7 +98,7 @@ def _reduce_ordinate(ordinate, unit='1km'):
     try:
         tile_res = TILE_SIZES[unit]
     except:
-        raise ValueError('Tile unit not recognised!')
+        raise ValueError("Tile unit not recognised!")
 
     if math.log10(tile_res) % 1 == 0.0:
         # resolution is a power of 10. Use integer division.
@@ -105,7 +114,8 @@ def _reduce_ordinate(ordinate, unit='1km'):
 
     return int(reduced)
 
-def _enlarge_ordinate(ordinate, unit='1km'):
+
+def _enlarge_ordinate(ordinate, unit="1km"):
     """
     Enlarges tile ordinate to UTM ordinate.
 
@@ -122,9 +132,10 @@ def _enlarge_ordinate(ordinate, unit='1km'):
     try:
         factor = TILE_FACTORS[unit]
     except:
-        raise ValueError('Tile unit not recognised!')
+        raise ValueError("Tile unit not recognised!")
 
-    return factor*int(ordinate)
+    return factor * int(ordinate)
+
 
 def _parse_name(string):
     """
@@ -140,16 +151,17 @@ def _parse_name(string):
     name = tile_name(string)
 
     if not validate_name(name):
-        raise ValueError('Not a valid tile name!')
+        raise ValueError("Not a valid tile name!")
 
-    (unit, northing, easting) = name.split('_')
+    (unit, northing, easting) = name.split("_")
     northing = _enlarge_ordinate(northing, unit)
     easting = _enlarge_ordinate(easting, unit)
     size = TILE_SIZES[unit]
 
     return TileInfo(northing, easting, size, unit)
 
-def name_from_point(northing, easting, unit='1km'):
+
+def name_from_point(northing, easting, unit="1km"):
     """
     Return tile name that containts (northing, easting)
 
@@ -162,14 +174,15 @@ def name_from_point(northing, easting, unit='1km'):
         tile name containging (northing, easting)
     """
     if unit not in TILE_SIZES:
-        raise ValueError('Tile size not regocnized')
+        raise ValueError("Tile size not regocnized")
 
     if northing < 0 or easting < 0:
-        raise ValueError('Only positive Northing or Easting accepted')
+        raise ValueError("Only positive Northing or Easting accepted")
 
     reduced_northing = _reduce_ordinate(northing, unit)
     reduced_easting = _reduce_ordinate(easting, unit)
-    return '{0}_{1}_{2}'.format(unit, reduced_northing, reduced_easting)
+    return "{0}_{1}_{2}".format(unit, reduced_northing, reduced_easting)
+
 
 def validate_name(name, units=None, strict=False):
     """
@@ -193,19 +206,20 @@ def validate_name(name, units=None, strict=False):
 
     for unit in units:
         if unit not in TILE_SIZES.keys():
-            raise ValueError('{0} is not a valid kvadratnet unit.'.format(unit))
+            raise ValueError("{0} is not a valid kvadratnet unit.".format(unit))
 
     if strict:
-        begin, end = '^', '$'
+        begin, end = "^", "$"
     else:
-        begin, end = '', ''
+        begin, end = "", ""
 
     for unit in units:
-        expr = '{begin}{expr}{end}'.format(begin=begin, expr=REGEX[unit], end=end)
+        expr = "{begin}{expr}{end}".format(begin=begin, expr=REGEX[unit], end=end)
         if re.match(expr, name):
             return True
 
     return False
+
 
 def tile_name(string):
     """
@@ -226,7 +240,8 @@ def tile_name(string):
         if match:
             return match.group()
 
-    raise ValueError('Tile name identier not detected in string')
+    raise ValueError("Tile name identier not detected in string")
+
 
 def extent_from_name(name):
     """
@@ -239,14 +254,14 @@ def extent_from_name(name):
         namedtuple with members min_easting, min_northing, max_easting, max_northing
     """
     if not validate_name(name):
-        raise ValueError('Not a valid tile name: {name}'.format(name=name))
+        raise ValueError("Not a valid tile name: {name}".format(name=name))
 
     tile = _parse_name(name)
 
-    return TileExtent(tile.easting,
-                      tile.northing,
-                      tile.easting + tile.size,
-                      tile.northing + tile.size)
+    return TileExtent(
+        tile.easting, tile.northing, tile.easting + tile.size, tile.northing + tile.size
+    )
+
 
 def wkt_from_name(name):
     """
@@ -258,19 +273,20 @@ def wkt_from_name(name):
     Returns:
         WKT polygon with the extent of the input tile.
     """
-    #pylint: disable=invalid-name
+    # pylint: disable=invalid-name
     # dx and dy seems quite sensible here...
 
     extent = extent_from_name(name)
 
     wkt = "POLYGON(("
     for dx, dy in ((0, 0), (0, 1), (1, 1), (1, 0)):
-        wkt += "{0:.2f} {1:.2f},".format(extent[2*dx], extent[2*dy+1])
+        wkt += "{0:.2f} {1:.2f},".format(extent[2 * dx], extent[2 * dy + 1])
     wkt += "{0:.2f} {1:.2f}))".format(extent[0], extent[1])
 
     return wkt
 
-def parent_tile(name, parent_unit=''):
+
+def parent_tile(name, parent_unit=""):
     """
     Return parent tile.
 
@@ -287,17 +303,18 @@ def parent_tile(name, parent_unit=''):
                         larger than the request parent.
     """
     tile = _parse_name(name)
-    if parent_unit == '':
+    if parent_unit == "":
         try:
-            parent_unit = UNITS[UNITS.index(tile.unit)+1]
+            parent_unit = UNITS[UNITS.index(tile.unit) + 1]
         except IndexError:
             # In case we reach the end of UNITS, use the same unit as the original tile input
-            raise ValueError('{tile} has no parent tile.'.format(tile=name))
+            raise ValueError("{tile} has no parent tile.".format(tile=name))
 
     if TILE_SIZES[tile.unit] >= TILE_SIZES[parent_unit]:
-        raise ValueError('Child tile unit is larger than or equal to child unit')
+        raise ValueError("Child tile unit is larger than or equal to child unit")
 
     return name_from_point(tile.northing, tile.easting, parent_unit)
+
 
 def tile_to_index(name, northing_origin, easting_origin):
     """
@@ -328,13 +345,13 @@ def tile_to_index(name, northing_origin, easting_origin):
         2D-index (northing, easting)
     """
     if not validate_name(name):
-        raise ValueError('Invalid tile name')
+        raise ValueError("Invalid tile name")
 
     tile = _parse_name(name)
 
     # round origin to nearest multiple of tile unit
-    easting_rounded = round(easting_origin/tile.size)*tile.size
-    northing_rounded = round(northing_origin/tile.size)*tile.size
+    easting_rounded = round(easting_origin / tile.size) * tile.size
+    northing_rounded = round(northing_origin / tile.size) * tile.size
 
     idx = (tile.easting - easting_rounded) / tile.size
     idy = (northing_rounded - tile.northing) / tile.size
