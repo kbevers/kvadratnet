@@ -1,0 +1,9 @@
+name: kvadratnet
+channels:
+  - defaults
+dependencies:
+  - python>=3.4
+  - pip
+  - pytest
+  - pytest-cov
+  - black

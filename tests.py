@@ -14,7 +14,7 @@
 Test suite for the kvadratnet module.
 """
 
-from nose.tools import assert_raises
+import pytest
 
 import kvadratnet
 
@@ -25,13 +25,16 @@ import kvadratnet
 def test_reduce_ordinate():
     """kvadratnet._reduce_ordinate"""
 
-    assert_raises(ValueError, kvadratnet._reduce_ordinate, 6223700, "300m")
+    with pytest.raises(ValueError):
+        kvadratnet._reduce_ordinate(6223700, "300m")
 
 
 def test_enlarge_ordinate():
     """kvadratnet._enlarge_ordinate"""
 
-    assert_raises(ValueError, kvadratnet._enlarge_ordinate, 2342, "5km")
+    with pytest.raises(ValueError):
+        kvadratnet._enlarge_ordinate(2342, "5km")
+
     assert kvadratnet._enlarge_ordinate(62237, "100m") == 6223700
     assert kvadratnet._enlarge_ordinate(622375, "250m") == 6223750
     assert kvadratnet._enlarge_ordinate(6432, "1km") == 6432000
@@ -43,7 +46,8 @@ def test_enlarge_ordinate():
 def test_parse_name():
     """kvadratnet._parse_name"""
 
-    assert_raises(ValueError, kvadratnet._parse_name, "BadName")
+    with pytest.raises(ValueError):
+        kvadratnet._parse_name("BadName")
     assert kvadratnet._parse_name("1km_6234_234") == (6234000, 234000, 1000, "1km")
     assert kvadratnet._parse_name("punktsky_1km_6234_234.laz") == (
         6234000,
@@ -57,8 +61,10 @@ def test_name_from_point():
     """kvadratnet.name_from_point"""
 
     point = (6223777, 575617)
-    assert_raises(ValueError, kvadratnet.name_from_point, -1, -1)
-    assert_raises(ValueError, kvadratnet.name_from_point, point[0], point[1], "23km")
+    with pytest.raises(ValueError):
+        kvadratnet.name_from_point(-1, -1)
+        kvadratnet.name_from_point(point[0], point[1], "23km")
+
     assert kvadratnet.name_from_point(point[0], point[1], unit="100km") == "100km_62_5"
     assert kvadratnet.name_from_point(point[0], point[1], unit="50km") == "50km_620_55"
     assert kvadratnet.name_from_point(point[0], point[1], unit="10km") == "10km_622_57"
@@ -97,15 +103,16 @@ def test_validate_name():
     assert not kvadratnet.validate_name("10km_23a_53")
     assert not kvadratnet.validate_name("notevenatile")
 
-    assert_raises(
-        ValueError, kvadratnet.validate_name, "1km_4141_524", ["59km", "1000km"]
-    )
+    with pytest.raises(ValueError):
+        kvadratnet.validate_name("1km_4141_524", ["59km", "1000km"])
 
 
 def test_extent_from_name():
     """kvadratnet.extent_from_name"""
 
-    assert_raises(ValueError, kvadratnet.extent_from_name, "BadName")
+    with pytest.raises(ValueError):
+        kvadratnet.extent_from_name("BadName")
+
     extent = kvadratnet.extent_from_name("1km_6223_575")
     assert extent == (575000, 6223000, 576000, 6224000)
     extent = kvadratnet.extent_from_name("10km_622_57")
@@ -132,8 +139,10 @@ def test_parent_tile():
     assert kvadratnet.parent_tile("1km_6223_575") == "10km_622_57"
     print(kvadratnet.parent_tile("100m_62237_5756", "250m"))
     assert kvadratnet.parent_tile("100m_62237_5756", "250m") == "250m_622350_57550"
-    assert_raises(ValueError, kvadratnet.parent_tile, "100km_62_5")
-    assert_raises(ValueError, kvadratnet.parent_tile, "10km_423_23", "1km")
+
+    with pytest.raises(ValueError):
+        kvadratnet.parent_tile("100km_62_5")
+        kvadratnet.parent_tile("10km_423_23", "1km")
 
 
 def test_tile_name():
@@ -142,7 +151,8 @@ def test_tile_name():
     print(name)
     assert name == "1km_5232_624"
 
-    assert_raises(ValueError, kvadratnet.tile_name, "not_a_tile_name")
+    with pytest.raises(ValueError):
+        kvadratnet.tile_name("not_a_tile_name")
 
 
 def test_tile_to_index():

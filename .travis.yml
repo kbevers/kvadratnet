@@ -12,7 +12,7 @@ before_install:
   - pip install coveralls
   - pip install coverage
 
-script: nosetests tests.py --with-coverage
+script: pytest tests.py --cov
 
 after_success:
   - coveralls
