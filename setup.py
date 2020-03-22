@@ -1,9 +1,6 @@
 """
 Setup script for the kvadratnet module.
 """
-
-import os
-import subprocess
 from setuptools import setup
 
 import kvadratnet
@@ -14,24 +11,9 @@ def readme():
     Return a properly formatted readme text, if possible, that can be used
     as the long description for setuptools.setup.
     """
-    # This will fail if pandoc is not in system path.
-    subprocess.call(
-        [
-            "pandoc",
-            "readme.md",
-            "--from",
-            "markdown",
-            "--to",
-            "rst",
-            "-s",
-            "-o",
-            "readme.rst",
-        ]
-    )
-    with open("readme.rst") as f:
-        readme = f.read()
-    os.remove("readme.rst")
-    return readme
+    with open("readme.md") as readme_file:
+        descr = readme_file.read()
+    return descr
 
 
 setup(
@@ -39,6 +21,7 @@ setup(
     version=kvadratnet.__version__,
     description="Python tools for working with the Danish Kvadratnet tiling scheme.",
     long_description=readme(),
+    long_description_content_type="text/markdown",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
