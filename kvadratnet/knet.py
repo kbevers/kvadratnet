@@ -9,7 +9,7 @@ from collections import Counter
 
 import click
 
-import kvadratnet
+import kvadratnet as kn
 
 
 @click.group()
@@ -51,7 +51,7 @@ def rename(files, prefix, postfix, verbose):
         (base, ext) = os.path.splitext(filename)
 
         try:
-            tilename = kvadratnet.tile_name(base)
+            tilename = kn.tile_name(base)
         except ValueError:
             print("{}: No kvadratnet tile name found. Skipping.".format(f))
             continue
@@ -88,7 +88,7 @@ def organize(units, files, verbose):
 
     # are input units known?
     for unit in units.split():
-        if not unit in kvadratnet.UNITS:
+        if not unit in kn.UNITS:
             raise ValueError("Unknown unit in units list ({})".format(unit))
 
     for f in files:
@@ -96,17 +96,17 @@ def organize(units, files, verbose):
         (base, ext) = os.path.splitext(filename)
 
         try:
-            tilename = kvadratnet.tile_name(base)
+            tilename = kn.tile_name(base)
         except ValueError:
             print("{}: No kvadratnet tile name found. Skipping.".format(f))
             continue
 
         sub_dirs = []
-        for unit in reversed(kvadratnet.UNITS):
+        for unit in reversed(kn.UNITS):
             if not unit in units:
                 continue
             try:
-                sub_dirs.append(kvadratnet.parent_tile(tilename, unit))
+                sub_dirs.append(kn.parent_tile(tilename, unit))
             except ValueError:
                 print("ERROR: {0} is smaller than {1}".format(unit, tilename))
                 sys.exit(1)
@@ -149,10 +149,10 @@ def parents(files, unique, count):
     parent_list = []
     for filename in files:
         try:
-            tilename = kvadratnet.tile_name(filename.rstrip())
+            tilename = kn.tile_name(filename.rstrip())
         except ValueError:
             continue
-        parent = kvadratnet.parent_tile(tilename)
+        parent = kn.parent_tile(tilename)
         parent_list.append(parent)
         counter[parent] += 1
 
