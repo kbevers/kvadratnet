@@ -8,6 +8,7 @@ python:
   - "3.8"
 
 before_install:
+  - pip install click
   - pip install coveralls
   - pip install coverage
 

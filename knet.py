@@ -5,17 +5,47 @@ Command line utils for kvadratnet.
 import os
 import sys
 import shutil
-import glob
-import argparse
 from collections import Counter
+
+import click
+
 import kvadratnet
 
 
-def run_rename(args):
+@click.group()
+def cli():
     """
-    Batch rename files by adding either a prefix or post to kvadranet identifier.
+    CLI for kvadratnet
     """
-    files = glob.glob(args.filespec)
+
+
+@cli.command()
+@click.argument(
+    "files", nargs=-1, required=True, type=click.Path("r"),
+)
+@click.option(
+    "--prefix",
+    default="",
+    help="Text before kvadratnet cell identifier, e.g. prefix_1km_6666_444.tif",
+)
+@click.option(
+    "--postfix",
+    default="",
+    help="Text after kvadratnet cell identifier, e.g. 1km_6666_444_postfix.tif",
+)
+@click.option(
+    "--verbose", "-v", is_flag=True, help="Be verbose",
+)
+def rename(files, prefix, postfix, verbose):
+    """
+    Batch rename files with kvadranet-names in them, e.g. add a prefix
+    before the cell identifier. If a pre- or postfix is not specified,
+    everything but the kvadratnet identifier is stripped from the filename
+
+
+    FILES is a list of files to be renamed. Can be a globbing expression,
+    e.g. 'dtm/*.tif'.
+    """
     for f in files:
         (folder, filename) = os.path.split(f)
         (base, ext) = os.path.splitext(filename)
@@ -26,24 +56,40 @@ def run_rename(args):
             print("{}: No kvadratnet tile name found. Skipping.".format(f))
             continue
 
-        new_filename = args.prefix + tilename + args.postfix + ext
+        new_filename = prefix + tilename + postfix + ext
         dst = os.path.join(folder, new_filename)
-        if args.verbose:
+        if verbose:
             print("Renaming {src} to {dst}".format(src=base + ext, dst=new_filename))
         os.rename(f, dst)
 
 
-def run_organize(args):
+@cli.command()
+@click.argument(
+    "units", required=True,
+)
+@click.argument(
+    "files", nargs=-1, type=click.Path("r"),
+)
+@click.option(
+    "--verbose", "-v", is_flag=True, help="Be verbose",
+)
+def organize(units, files, verbose):
     """
-    Organize files in folders according to a chosen kvadratnet-level.
+    Organize files into subfolders according to supplied
+    list of tile units.
+
+    FILES is a list of files thatrepresents files to be organized. Can be a
+    globbing expression, e.g. 'dtm/*.tif'.
+
+    UNITS is a list of units representing folders that files will be re-organized
+    into. Allowed units are 100m, 250m, 1km, 10kmm 50km, and 100km. The list has
+    to be quoted string, e.g. "100km 10km".
     """
+
     # are input units known?
-    units = args.unit
-    for unit in units:
+    for unit in units.split():
         if not unit in kvadratnet.UNITS:
             raise ValueError("Unknown unit in units list ({})".format(unit))
-
-    files = glob.glob(args.filespec)
 
     for f in files:
         (_, filename) = os.path.split(f)
@@ -72,7 +118,7 @@ def run_organize(args):
             pass
 
         dst = os.path.join(folder, filename)
-        if args.verbose:
+        if verbose:
             print(
                 "Moving {filename} into {folder}".format(
                     filename=filename, folder=folder
@@ -81,99 +127,44 @@ def run_organize(args):
         shutil.move(f, dst)
 
 
-def run_parents(args):
+@cli.command()
+@click.argument(
+    "files", nargs=-1, required=True, type=click.Path("r"),
+)
+@click.option(
+    "--unique", is_flag=True, help="Only show unique parents",
+)
+@click.option(
+    "--count", is_flag=True, help="Show number of childs for each parent",
+)
+def parents(files, unique, count):
     """
     Create a list of parent tiles from a list of inputs child tiles.
+
+    FILES is a list of files that represent child files. Can be globbing
+    expression, e.g. dtm/*.tif.
     """
+
     counter = Counter()
-    parents = []
-    for line in args.infile:
+    parent_list = []
+    for filename in files:
         try:
-            tilename = kvadratnet.tile_name(line.rstrip())
+            tilename = kvadratnet.tile_name(filename.rstrip())
         except ValueError:
-            pass
+            continue
         parent = kvadratnet.parent_tile(tilename)
-        parents.append(parent)
+        parent_list.append(parent)
         counter[parent] += 1
 
-    if args.unique:
+    if unique:
         for key, value in counter.items():
-            if args.count:
+            if count:
                 print("{:<20} {}".format(key, value))
             else:
                 print(key)
     else:
-        for parent in parents:
-            if args.count:
+        for parent in parent_list:
+            if count:
                 print("{:<20} {}".format(parent, counter[parent]))
             else:
                 print(parent)
-
-
-def main():
-    """
-    Entry point for the knet command line interface of kvadratnet
-    """
-    parser = argparse.ArgumentParser(prog="knet", description="CLI for kvadratnet")
-    subparsers = parser.add_subparsers()
-
-    rename = subparsers.add_parser(
-        "rename",
-        help="""Rename files with kvadranet-names in them, e.g. add a prefix
-                before the cell identifier. If a pre- or postfix is not specified,
-                everything but the kvadratnet identifier is stripped from the filename""",
-    )
-    rename.add_argument(
-        "filespec", help="Files to rename. Should be a globbing expression"
-    )
-    rename.add_argument(
-        "--prefix",
-        default="",
-        help="Text before kvadratnet cell identifier, e.g. prefix_1km_6666_444.tif",
-    )
-    rename.add_argument(
-        "--postfix",
-        default="",
-        help="Text after kvadratnet cell identifier, e.g. 1km_6666_444_postfix.tif",
-    )
-    rename.add_argument(
-        "--verbose", "-v", action="store_true", help="Be verbose",
-    )
-    rename.set_defaults(func=run_rename)
-
-    organize = subparsers.add_parser(
-        "organize",
-        help="""Organize files into subfolders according to supplied
-                  list of tile units.""",
-    )
-    organize.add_argument(
-        "filespec",
-        help="""Files to move into subfolders. Globbing expression, e.g. "dtm/*.tif".
-                Remember the quotation marks.""",
-    )
-    organize.add_argument(
-        "unit",
-        nargs="+",
-        help="Unit-folders to subdivide files into. More than one unit can be supplied.",
-    )
-    organize.add_argument(
-        "--verbose", "-v", action="store_true", help="Be verbose",
-    )
-    organize.set_defaults(func=run_organize)
-
-    parents = subparsers.add_parser(
-        "parents", help="Create a list of parent tiles based on a list of input tiles",
-    )
-    parents.add_argument(
-        "infile", nargs="?", type=argparse.FileType("r"), default=sys.stdin
-    )
-    parents.add_argument(
-        "--unique", action="store_true", help="Only show unique parents"
-    )
-    parents.add_argument(
-        "--count", action="store_true", help="Show number of childs for each parent"
-    )
-    parents.set_defaults(func=run_parents)
-
-    args = parser.parse_args()
-    args.func(args)
